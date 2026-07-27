@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: cloudnative-pg
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   project: default
   source:
@@ -11,6 +13,15 @@ spec:
     targetRevision: 0.26.0
     helm:
       releaseName: cnpg
+      values: |
+        crds:
+          create: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: cnpg-system
@@ -20,12 +31,15 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: redis-operator
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   project: default
   source:
@@ -34,6 +48,11 @@ spec:
     targetRevision: 0.22.2
     helm:
       releaseName: redis-operator
+      values: |
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: redis-operator
@@ -43,12 +62,15 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: rabbitmq-cluster-operator
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   project: default
   source:
@@ -57,6 +79,17 @@ spec:
     targetRevision: 4.4.34
     helm:
       releaseName: rabbitmq-operator
+      values: |
+        clusterOperator:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        msgTopologyOperator:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: rabbitmq-operator
@@ -66,12 +99,15 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: mariadb-operator
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   project: default
   source:
@@ -80,6 +116,11 @@ spec:
     targetRevision: 25.10.4
     helm:
       releaseName: mariadb-operator
+      values: |
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: mariadb-operator
@@ -89,3 +130,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
