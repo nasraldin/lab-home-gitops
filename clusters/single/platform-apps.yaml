@@ -243,7 +243,10 @@ spec:
       releaseName: longhorn
       values: |
         defaultSettings:
+          # 3 workers × 100Gi data disks. Replica 2 is fine once data disks are mounted
+          # (ansible role k8s_longhorn_disk). Without data disks, use 1.
           defaultReplicaCount: 2
+          storageOverProvisioningPercentage: 100
         persistence:
           defaultClassReplicaCount: 2
         preUpgradeChecker:

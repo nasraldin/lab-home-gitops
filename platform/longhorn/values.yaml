@@ -1,5 +1,9 @@
 defaultSettings:
+  # Requires ansible role k8s_longhorn_disk (Terraform data_disk_gb mounted at
+  # /var/lib/longhorn) before this chart syncs. Otherwise replicas land on the
+  # ~60Gi OS disk and PVC scheduling fails.
   defaultReplicaCount: 2
+  storageOverProvisioningPercentage: 100
 persistence:
   defaultClassReplicaCount: 2
 preUpgradeChecker:

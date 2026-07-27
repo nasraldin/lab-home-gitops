@@ -28,7 +28,7 @@ spec:
           LITE_LLM_MODEL_PREF: "gemma4:12b"
           EMBEDDING_ENGINE: native
         persistentVolume:
-          size: 20Gi
+          size: 8Gi
           storageClass: longhorn
           mountPath: /app/server/storage
         service:

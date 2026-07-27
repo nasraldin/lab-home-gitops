@@ -25,7 +25,8 @@ spec:
   superuserSecret:
     name: postgres-superuser
   storage:
-    size: 30Gi
+    # Homelab: keep small — workers have 100Gi data disks; 2 replicas × size must fit.
+    size: 10Gi
     storageClass: longhorn
   resources:
     requests:
