@@ -1,4 +1,5 @@
 .DS_Store
 *.secret.yaml
-secrets/
+# Local secret dumps only (not GitOps InfisicalSecret CRs under platform/)
+/secrets/
 *.decrypted.yaml
