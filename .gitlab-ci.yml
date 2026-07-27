@@ -5,6 +5,7 @@ include:
       - templates/lint/yaml.yml
       - templates/gitops/helm-lint.yml
       - templates/gitops/kubeconform.yml
+      - templates/security/gitleaks.yml
       - templates/security/trivy-filesystem.yml
 
 stages:
@@ -30,6 +31,12 @@ detect-services:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+security:gitleaks:
+  extends: .security_gitleaks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 security:trivy-fs-scan:
   extends: .security_trivy_filesystem
   variables:
@@ -39,7 +46,9 @@ security:trivy-fs-scan:
       changes:
         - platform/**/*
         - clusters/**/*
+        - apps/**/*
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - platform/**/*
         - clusters/**/*
+        - apps/**/*
