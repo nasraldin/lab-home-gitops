@@ -1,0 +1,2 @@
+# Placeholder values — bump chart versions in clusters/prod Applications.
+installCRDs: true

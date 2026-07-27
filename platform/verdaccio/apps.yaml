@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: verdaccio
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.verdaccio.org
+    chart: verdaccio
+    targetRevision: 4.29.0
+    helm:
+      releaseName: verdaccio
+      values: |
+        persistence:
+          enabled: true
+          storageClass: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: verdaccio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

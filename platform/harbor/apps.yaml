@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://helm.goharbor.io
+    chart: harbor
+    targetRevision: 1.18.0
+    helm:
+      releaseName: harbor
+      values: |
+        externalURL: https://harbor.nasraldin.com
+        expose:
+          type: loadBalancer
+          tls:
+            enabled: false
+          loadBalancer:
+            IP: 192.168.68.101
+        persistence:
+          persistentVolumeClaim:
+            registry:
+              storageClass: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

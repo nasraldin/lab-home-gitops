@@ -1,0 +1,30 @@
+include:
+  - project: homelab/pipeline-templates
+    ref: main
+    file:
+      - templates/lint/yaml.yml
+      - templates/gitops/helm-lint.yml
+      - templates/gitops/kubeconform.yml
+
+stages:
+  - .pre
+  - lint
+  - validate
+
+variables:
+  GITOPS_COMPONENT:
+    value: ""
+    description: "Optional — limit validation to one platform component (e.g. keycloak)"
+
+detect-services:
+  stage: .pre
+  image: alpine:3.21
+  script:
+    - apk add --no-cache git bash
+    - bash scripts/detect-changed-services.sh maps/lab-home-gitops-services.yml > changed-services.env || true
+  artifacts:
+    reports:
+      dotenv: changed-services.env
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

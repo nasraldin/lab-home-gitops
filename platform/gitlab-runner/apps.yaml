@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.gitlab.io
+    chart: gitlab-runner
+    targetRevision: 0.79.0
+    helm:
+      releaseName: gitlab-runner
+      values: |
+        gitlabUrl: https://gitlab.nasraldin.com
+        rbac:
+          create: true
+        runners:
+          secret: gitlab-runner-token
+          config: |
+            [[runners]]
+              name = "k8s-autoscaled"
+              executor = "kubernetes"
+              [runners.kubernetes]
+                namespace = "gitlab-runner"
+                image = "alpine:latest"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab-runner
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

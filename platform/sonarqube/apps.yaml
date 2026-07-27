@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarqube
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://SonarSource.github.io/helm-chart-sonarqube
+    chart: sonarqube
+    targetRevision: 2025.6.0
+    helm:
+      releaseName: sonarqube
+      values: |
+        jdbcOverwrite:
+          enabled: true
+          jdbcUrl: jdbc:postgresql://postgres-rw.data.svc.cluster.local:5432/sonar
+          jdbcUsername: sonar
+          jdbcSecretName: sonarqube-db
+          jdbcSecretPasswordKey: password
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sonarqube
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
