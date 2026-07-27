@@ -8,25 +8,25 @@ everything else syncs from this repository.
 
 ## Layout
 
-| Path | Purpose |
-| ---- | ------- |
-| `bootstrap/` | Root Application → `clusters/single` |
-| `clusters/single/` | Platform Application lists |
-| `platform/` | cert-manager, Longhorn, data operators, Keycloak, SonarQube, Harbor, … |
-| `apps/` | Your workloads |
+| Path               | Purpose                                                                |
+| ------------------ | ---------------------------------------------------------------------- |
+| `bootstrap/`       | Root Application → `clusters/single`                                   |
+| `clusters/single/` | Platform Application lists                                             |
+| `platform/`        | cert-manager, Longhorn, data operators, Keycloak, SonarQube, Harbor, … |
+| `apps/`            | Your workloads                                                         |
 
 ## Sync order (waves)
 
-1. cert-manager  
-2. metrics-server  
-3. external-secrets + Infisical operator  
-4. keda  
-5. longhorn  
-6. data operators (CNPG, Redis, RabbitMQ, MariaDB)  
-7. keycloak, sonarqube  
-8. harbor, verdaccio  
-9. observability (Prometheus, Grafana, Loki, Tempo)  
-10. gitlab-runner + KEDA  
+1. cert-manager
+2. metrics-server
+3. external-secrets + Infisical operator
+4. keda
+5. longhorn
+6. data operators (CNPG, Redis, RabbitMQ, MariaDB)
+7. keycloak, sonarqube
+8. harbor, verdaccio
+9. observability (Prometheus, Grafana, Loki, Tempo)
+10. gitlab-runner + KEDA
 
 **Not included** (practice lab only): Istio, Kyverno, affinity-demo.
 
