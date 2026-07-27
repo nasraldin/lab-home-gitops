@@ -15,7 +15,7 @@ spec:
         # Public/LAN: npm.nasraldin.com / npm.lab (not Nginx Proxy Manager)
         service:
           type: LoadBalancer
-          loadBalancerIP: 192.168.68.105
+          loadBalancerIP: 192.168.68.106
           port: 80
         persistence:
           enabled: true
