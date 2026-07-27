@@ -19,10 +19,19 @@ spec:
             enabled: false
           loadBalancer:
             IP: 192.168.68.101
+        # Initial admin password: set once from Infisical kubernetes/harbor
+        # (HARBOR_ADMIN_PASSWORD) via `argocd app set` or helm --set after seed.
+        # Do not commit the password. InfisicalSecret harbor-admin keeps SoT.
         persistence:
           persistentVolumeClaim:
             registry:
               storageClass: longhorn
+        trivy:
+          enabled: true
+          ignoreUnfixed: true
+          insecure: false
+        notary:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: harbor

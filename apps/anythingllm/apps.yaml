@@ -1,0 +1,58 @@
+# AnythingLLM → LiteLLM gateway → Ollama on ai-01 (gemma4:12b)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-anythingllm
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "61"
+spec:
+  project: default
+  source:
+    repoURL: https://mintplex-labs.github.io/helm-charts
+    chart: anythingllm
+    targetRevision: 1.0.0
+    helm:
+      releaseName: anythingllm
+      values: |
+        config:
+          DISABLE_TELEMETRY: "true"
+          NODE_ENV: production
+          STORAGE_DIR: /app/server/storage
+          UID: "1000"
+          GID: "1000"
+          # Native LiteLLM provider → in-cluster gateway → Ollama.
+          LLM_PROVIDER: litellm
+          LITE_LLM_BASE_PATH: "http://litellm.litellm.svc.cluster.local:4000"
+          LITE_LLM_API_KEY: "sk-lab-litellm-59e851e6f6202963a67be3e262a7a647"
+          LITE_LLM_MODEL_PREF: "gemma4:12b"
+          EMBEDDING_ENGINE: native
+        persistentVolume:
+          size: 20Gi
+          storageClass: longhorn
+          mountPath: /app/server/storage
+        service:
+          type: LoadBalancer
+          port: 3001
+          annotations:
+            lbipam.cilium.io/ips: "192.168.68.106"
+        ingress:
+          enabled: false
+        nodeSelector:
+          workload: apps
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: anythingllm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

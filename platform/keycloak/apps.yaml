@@ -22,9 +22,12 @@ spec:
           loadBalancerIP: 192.168.68.103
         ingress:
           enabled: false
+        # Admin + DB passwords from Infisical (platform/secrets InfisicalSecret CRs).
+        # Bootstrap: seed Infisical, create machine-identity Secret, wait for sync.
         auth:
           adminUser: admin
-          adminPassword: changeme
+          existingSecret: keycloak-admin
+          passwordSecretKey: admin-password
         postgresql:
           enabled: false
         externalDatabase:

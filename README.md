@@ -8,27 +8,37 @@ everything else syncs from this repository.
 
 ## Layout
 
-| Path               | Purpose                                                                |
-| ------------------ | ---------------------------------------------------------------------- |
-| `bootstrap/`       | Root Application → `clusters/single`                                   |
-| `clusters/single/` | Platform Application lists                                             |
-| `platform/`        | cert-manager, Longhorn, data operators, Keycloak, SonarQube, Harbor, … |
-| `apps/`            | Your workloads                                                         |
+| Path               | Purpose                                                                 |
+| ------------------ | ----------------------------------------------------------------------- |
+| `bootstrap/`       | Root Application → `clusters/single`                                    |
+| `clusters/single/` | Platform Application lists                                              |
+| `platform/`        | cert-manager, Longhorn, Kyverno, secrets bootstrap, Keycloak, Harbor, … |
+| `apps/`            | Your workloads                                                          |
 
 ## Sync order (waves)
 
 1. cert-manager
 2. metrics-server
 3. external-secrets + Infisical operator
-4. keda
-5. longhorn
-6. data operators (CNPG, Redis, RabbitMQ, MariaDB)
-7. keycloak, sonarqube
-8. harbor, verdaccio
-9. observability (Prometheus, Grafana, Loki, Tempo)
-10. gitlab-runner + KEDA
+4. Kyverno + Audit policies + Infisical bootstrap hint
+5. keda
+6. longhorn
+7. data operators (CNPG, Redis, RabbitMQ, MariaDB)
+8. keycloak, sonarqube (InfisicalSecret CRs in-path)
+9. harbor (Trivy on), verdaccio
+10. observability (Prometheus, Grafana, Loki, Tempo, **OTel Collector**)
+11. gitlab-runner + KEDA
 
-**Not included** (practice lab only): Istio, Kyverno, affinity-demo.
+OTLP endpoint (after sync): `http://otel-collector.observability.svc:4318`
+(LAN LB `.110`). See [OpenTelemetry](https://nasraldin.github.io/dev-homelab/architecture/opentelemetry).
+
+Secrets: [Infisical](https://nasraldin.github.io/dev-homelab/architecture/secrets-and-infisical) —
+seed from `lab-home-k8s` ansible, sync via InfisicalSecret CRs.
+
+Supply chain: [docs](https://nasraldin.github.io/dev-homelab/architecture/supply-chain) —
+Kyverno Audit first; Cosign Enforce after CI signs Harbor images.
+
+**Not included yet:** Falco, Wazuh (see [Wazuh placement](https://nasraldin.github.io/dev-homelab/architecture/wazuh)).
 
 Public URLs are configured in `lab-home-k8s` group_vars — see the
 [Dev Homelab docs](https://nasraldin.github.io/dev-homelab/) (daily guide and

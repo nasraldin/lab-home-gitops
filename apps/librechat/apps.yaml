@@ -1,0 +1,91 @@
+# LibreChat → LiteLLM gateway → Ollama on ai-01 (gemma4:12b)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-librechat
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "60"
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/danny-avila/librechat-chart
+    chart: librechat
+    targetRevision: 2.0.7
+    helm:
+      releaseName: librechat
+      values: |
+        # Lab secrets — rotate after first sync (private GitLab).
+        global:
+          librechat:
+            existingSecretName: ""
+        librechat:
+          existingSecretName: ""
+          configEnv:
+            CREDS_KEY: "99104b3cea6452eba70fb6170a664cf0609df2e7b338f9d6a73cbc6e284c653e"
+            CREDS_IV: "e3a09d5be019135a610ebbb091707190"
+            JWT_SECRET: "2fa7fb891f8bd451088f2860c88375db30230d30494be9f48f348ec73641d6ff"
+            JWT_REFRESH_SECRET: "b0469a0ec97a5be13c8e77478811b0429bb289d8f40d65082d8a5afc00e9be5b"
+            MEILI_MASTER_KEY: "a15954f65493b9ef7dd076dcaf55392cebb53c7a25f909a51e66b4e87a161c6d"
+          configYamlContent: |
+            version: 1.2.1
+            cache: true
+            endpoints:
+              custom:
+                - name: "LiteLLM"
+                  apiKey: "sk-lab-litellm-59e851e6f6202963a67be3e262a7a647"
+                  baseURL: "http://litellm.litellm.svc.cluster.local:4000/v1"
+                  models:
+                    default:
+                      - "gemma4:12b"
+                    fetch: true
+                  titleConvo: true
+                  titleModel: "current_model"
+                  modelDisplayLabel: "LiteLLM (gemma4:12b)"
+          imageVolume:
+            enabled: true
+            size: 10G
+            storageClassName: longhorn
+        mongodb:
+          enabled: true
+          image:
+            repository: bitnamilegacy/mongodb
+          auth:
+            enabled: false
+          persistence:
+            storageClass: longhorn
+            size: 8Gi
+        meilisearch:
+          enabled: true
+          persistence:
+            enabled: true
+            storageClass: longhorn
+          auth:
+            existingMasterKeySecret: ""
+          environment:
+            MEILI_ENV: production
+            MEILI_NO_ANALYTICS: true
+            MEILI_MASTER_KEY: "a15954f65493b9ef7dd076dcaf55392cebb53c7a25f909a51e66b4e87a161c6d"
+        librechat-rag-api:
+          enabled: false
+        redis:
+          enabled: false
+        service:
+          type: LoadBalancer
+          port: 3080
+          annotations:
+            lbipam.cilium.io/ips: "192.168.68.105"
+        ingress:
+          enabled: false
+        nodeSelector:
+          workload: apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: librechat
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

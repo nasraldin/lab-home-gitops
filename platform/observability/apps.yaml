@@ -1,3 +1,8 @@
+# Observability: Prometheus/Grafana, Loki, Tempo, OpenTelemetry Collector
+# Apps should send OTLP to the Collector (not Tempo directly):
+#   http://otel-collector.observability.svc.cluster.local:4318
+#   (gRPC :4317)  ·  LAN LB: http://192.168.68.110:4318
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -16,7 +21,11 @@ spec:
       values: |
         grafana:
           enabled: true
-          adminPassword: changeme
+          # Password from Infisical → InfisicalSecret grafana-admin
+          admin:
+            existingSecret: grafana-admin
+            userKey: admin-user
+            passwordKey: admin-password
           ingress:
             enabled: false
           service:
@@ -26,9 +35,48 @@ spec:
             server:
               root_url: https://grafana.nasraldin.com
               domain: grafana.nasraldin.com
+            feature_toggles:
+              enable: traceqlEditor traceQLStreaming correlations
+          # Prometheus is provisioned by the chart (uid: prometheus).
+          additionalDataSources:
+            - name: Tempo
+              type: tempo
+              uid: tempo
+              url: http://tempo.observability.svc.cluster.local:3200
+              access: proxy
+              jsonData:
+                httpMethod: GET
+                tracesToLogsV2:
+                  datasourceUid: loki
+                  spanStartTimeShift: "-1h"
+                  spanEndTimeShift: "1h"
+                  filterByTraceID: true
+                  filterBySpanID: false
+                tracesToMetrics:
+                  datasourceUid: prometheus
+                serviceMap:
+                  datasourceUid: prometheus
+                nodeGraph:
+                  enabled: true
+                lokiSearch:
+                  datasourceUid: loki
+            - name: Loki
+              type: loki
+              uid: loki
+              url: http://loki-gateway.observability.svc.cluster.local
+              access: proxy
+              jsonData:
+                derivedFields:
+                  - datasourceUid: tempo
+                    matcherRegex: '"traceID":\s*"(\w+)"|"trace_id":\s*"(\w+)"|traceID=(\w+)'
+                    name: TraceID
+                    url: "$${__value.raw}"
+                    urlDisplayLabel: View Trace
         prometheus:
           prometheusSpec:
             retention: 7d
+            # Accept OTLP metrics via remote_write from the Collector.
+            enableRemoteWriteReceiver: true
             resources:
               requests:
                 cpu: 100m
@@ -78,8 +126,15 @@ spec:
                 index:
                   prefix: loki_index_
                   period: 24h
+          # Structured metadata required for OTLP log attributes.
+          limits_config:
+            allow_structured_metadata: true
         singleBinary:
           replicas: 1
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            size: 20Gi
         backend:
           replicas: 0
         read:
@@ -107,6 +162,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -132,6 +188,19 @@ spec:
                   endpoint: 0.0.0.0:4317
                 http:
                   endpoint: 0.0.0.0:4318
+          metricsGenerator:
+            enabled: true
+            remoteWriteUrl: "http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090/api/v1/write"
+          overrides:
+            defaults:
+              metrics_generator:
+                processors:
+                  - service-graphs
+                  - span-metrics
+        persistence:
+          enabled: true
+          storageClassName: longhorn
+          size: 20Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
@@ -141,3 +210,125 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+---
+# OpenTelemetry Collector — single OTLP intake for the lab.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "53"
+spec:
+  project: default
+  source:
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart: opentelemetry-collector
+    targetRevision: 0.165.0
+    helm:
+      releaseName: otel-collector
+      values: |
+        mode: deployment
+        fullnameOverride: otel-collector
+        replicaCount: 1
+        image:
+          repository: otel/opentelemetry-collector-contrib
+        presets:
+          kubernetesAttributes:
+            enabled: true
+        service:
+          type: LoadBalancer
+          annotations:
+            lbipam.cilium.io/ips: "192.168.68.110"
+        ports:
+          otlp:
+            enabled: true
+            containerPort: 4317
+            servicePort: 4317
+            protocol: TCP
+            appProtocol: grpc
+            hostPort: null
+          otlp-http:
+            enabled: true
+            containerPort: 4318
+            servicePort: 4318
+            protocol: TCP
+            hostPort: null
+          jaeger-compact:
+            enabled: false
+          jaeger-thrift:
+            enabled: false
+          jaeger-grpc:
+            enabled: false
+          zipkin:
+            enabled: false
+          metrics:
+            enabled: true
+            hostPort: null
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+        config:
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: ${env:MY_POD_IP}:4317
+                http:
+                  endpoint: ${env:MY_POD_IP}:4318
+          processors:
+            memory_limiter:
+              check_interval: 5s
+              limit_percentage: 80
+              spike_limit_percentage: 25
+            batch:
+              send_batch_size: 1024
+              timeout: 5s
+          exporters:
+            otlphttp/tempo:
+              endpoint: http://tempo.observability.svc.cluster.local:4318
+              tls:
+                insecure: true
+            otlphttp/loki:
+              endpoint: http://loki-gateway.observability.svc.cluster.local:80/otlp
+              tls:
+                insecure: true
+            prometheusremotewrite:
+              endpoint: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090/api/v1/write
+              tls:
+                insecure: true
+            debug:
+              verbosity: basic
+          extensions:
+            health_check:
+              endpoint: ${env:MY_POD_IP}:13133
+          service:
+            extensions:
+              - health_check
+            pipelines:
+              traces:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [otlphttp/tempo]
+              metrics:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [prometheusremotewrite]
+              logs:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [otlphttp/loki]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

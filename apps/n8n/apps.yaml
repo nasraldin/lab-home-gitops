@@ -1,0 +1,64 @@
+# n8n → LiteLLM OpenAI creds (http://litellm.litellm.svc.cluster.local:4000/v1)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-n8n
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "62"
+spec:
+  project: default
+  source:
+    repoURL: 8gears.container-registry.com/library
+    chart: n8n
+    targetRevision: 2.0.1
+    helm:
+      releaseName: n8n
+      values: |
+        main:
+          config:
+            n8n:
+              host: "192.168.68.107"
+              port: 5678
+              protocol: "http"
+              editor_base_url: "http://192.168.68.107/"
+              # After login: Credentials → OpenAI
+              #   Base URL: http://litellm.litellm.svc.cluster.local:4000/v1
+              #   API key:  sk-lab-litellm-… (see litellm/apps.yaml masterkey)
+              #   Model:    gemma4:12b
+              # Do not point n8n at Ollama directly — use LiteLLM.
+          secret:
+            n8n:
+              encryption_key: "kNiWWEJd49Ev0eaAZ/DWXfkvJZwKwx4nBcvnl+QYcyo="
+          persistence:
+            enabled: true
+            type: dynamic
+            size: 8Gi
+            storageClass: longhorn
+          service:
+            type: LoadBalancer
+            port: 80
+            annotations:
+              lbipam.cilium.io/ips: "192.168.68.107"
+          nodeSelector:
+            workload: apps
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+        worker:
+          enabled: false
+        ingress:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: n8n
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

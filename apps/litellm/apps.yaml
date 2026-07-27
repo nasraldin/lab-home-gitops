@@ -1,0 +1,86 @@
+# LiteLLM — OpenAI-compatible gateway → Ollama on ai-01
+# Clients (LibreChat, AnythingLLM, n8n, Open WebUI) should call this service,
+# not Ollama directly.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-litellm
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "55"
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/berriai
+    chart: litellm-helm
+    targetRevision: 1.93.0
+    helm:
+      releaseName: litellm
+      values: |
+        replicaCount: 1
+        image:
+          repository: ghcr.io/berriai/litellm-database
+          pullPolicy: IfNotPresent
+        # Lab master key — clients use this as the OpenAI API key.
+        # Rotate for shared/long-lived environments.
+        masterkey: "sk-lab-litellm-59e851e6f6202963a67be3e262a7a647"
+        service:
+          type: LoadBalancer
+          port: 4000
+          annotations:
+            lbipam.cilium.io/ips: "192.168.68.108"
+        ingress:
+          enabled: false
+        nodeSelector:
+          workload: apps
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
+        redis:
+          enabled: false
+        db:
+          deployStandalone: true
+          useExisting: false
+        postgresql:
+          architecture: standalone
+          auth:
+            username: litellm
+            database: litellm
+            password: "W4OeTqjNQ1VV2NKCh2HJ50jvZ8mARNga"
+            postgres-password: "acdc08be1724170a9275042a45bfdcbf"
+          primary:
+            persistence:
+              storageClass: longhorn
+              size: 8Gi
+            nodeSelector:
+              workload: apps
+        proxy_config:
+          model_list:
+            - model_name: gemma4:12b
+              litellm_params:
+                model: ollama/gemma4:12b
+                api_base: http://192.168.68.20:11434
+            # Alias for OpenAI-style clients that expect a generic name
+            - model_name: gemma4-12b
+              litellm_params:
+                model: ollama/gemma4:12b
+                api_base: http://192.168.68.20:11434
+          general_settings:
+            master_key: os.environ/PROXY_MASTER_KEY
+        migrationJob:
+          hooks:
+            argocd:
+              enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: litellm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
