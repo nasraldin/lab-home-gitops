@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: apps
     directory:

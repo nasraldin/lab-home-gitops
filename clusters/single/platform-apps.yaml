@@ -157,7 +157,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/kyverno
   destination:
@@ -180,7 +180,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/secrets
   destination:
@@ -273,7 +273,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/data
   destination:
@@ -296,7 +296,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/keycloak
   destination:
@@ -319,7 +319,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/sonarqube
   destination:
@@ -342,7 +342,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/harbor
   destination:
@@ -365,7 +365,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/verdaccio
   destination:
@@ -388,7 +388,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/observability
   destination:
@@ -411,7 +411,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.nasraldin.com/homelab/lab-home-gitops.git
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
     targetRevision: HEAD
     path: platform/gitlab-runner
   destination:
