@@ -21,6 +21,10 @@ spec:
       values: |
         grafana:
           enabled: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           # Password from Infisical → InfisicalSecret grafana-admin
           admin:
             existingSecret: grafana-admin
@@ -81,8 +85,28 @@ spec:
               requests:
                 cpu: 100m
                 memory: 512Mi
+        prometheusOperator:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        prometheus-node-exporter:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+        kube-state-metrics:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
         alertmanager:
           enabled: true
+          alertmanagerSpec:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
@@ -131,6 +155,10 @@ spec:
             allow_structured_metadata: true
         singleBinary:
           replicas: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           persistence:
             enabled: true
             storageClass: longhorn
@@ -147,6 +175,10 @@ spec:
           enabled: false
         gateway:
           enabled: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
         lokiCanary:
           enabled: false
         test:
@@ -201,6 +233,12 @@ spec:
           enabled: true
           storageClassName: longhorn
           size: 10Gi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: observability

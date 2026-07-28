@@ -30,6 +30,43 @@ spec:
           enabled: true
           ignoreUnfixed: true
           insecure: false
+        nginx:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+        portal:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+        core:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+        jobservice:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+        registry:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+        database:
+          internal:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+        redis:
+          internal:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
         notary:
           enabled: false
   destination:

@@ -132,6 +132,8 @@ spec:
                 - kube-system
                 - kyverno
                 - longhorn-system
+                # node-exporter DaemonSet requires hostNetwork to scrape node metrics
+                - observability
       validate:
         message: "Sharing the host namespaces is disallowed."
         pattern:

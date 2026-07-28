@@ -80,12 +80,33 @@ spec:
     helm:
       releaseName: rabbitmq-operator
       values: |
+        # Bitnami moved versioned tags to docker.io/bitnamilegacy (Aug 2025).
+        # Override all operator + operand images until we migrate off Bitnami charts.
+        global:
+          security:
+            allowInsecureImages: true
+        rabbitmqImage:
+          registry: docker.io
+          repository: bitnamilegacy/rabbitmq
+          tag: 4.1.3-debian-12-r1
+        credentialUpdaterImage:
+          registry: docker.io
+          repository: bitnamilegacy/rmq-default-credential-updater
+          tag: 1.0.8-debian-12-r0
         clusterOperator:
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/rabbitmq-cluster-operator
+            tag: 2.16.1-debian-12-r0
           resources:
             requests:
               cpu: 100m
               memory: 128Mi
         msgTopologyOperator:
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/rmq-messaging-topology-operator
+            tag: 1.17.4-debian-12-r0
           resources:
             requests:
               cpu: 50m
