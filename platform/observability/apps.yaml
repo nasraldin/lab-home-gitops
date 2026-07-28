@@ -90,6 +90,11 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+          prometheusConfigReloader:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
         prometheus-node-exporter:
           resources:
             requests:
@@ -162,7 +167,7 @@ spec:
           persistence:
             enabled: true
             storageClass: longhorn
-            size: 10Gi
+            size: 20Gi
         backend:
           replicas: 0
         read:
@@ -229,16 +234,16 @@ spec:
                 processors:
                   - service-graphs
                   - span-metrics
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
         persistence:
           enabled: true
           storageClassName: longhorn
-          size: 10Gi
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            memory: 512Mi
+          size: 20Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
