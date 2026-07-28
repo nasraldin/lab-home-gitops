@@ -25,8 +25,8 @@ spec:
   superuserSecret:
     name: postgres-superuser
   storage:
-    # Homelab: keep small — workers have 100Gi data disks; 2 replicas × size must fit.
-    size: 10Gi
+    # Match live PVC (CNPG cannot shrink). Homelab workers have 100Gi data disks.
+    size: 30Gi
     storageClass: longhorn
   resources:
     requests:

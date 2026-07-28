@@ -142,6 +142,16 @@ spec:
           requests:
             cpu: 50m
             memory: 64Mi
+        webhook:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+        certController:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: mariadb-operator
