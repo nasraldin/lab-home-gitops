@@ -14,6 +14,14 @@ data:
         "auth": {
           "mode": "token"
         },
+        "trustedProxies": [
+          "192.168.68.14",
+          "10.244.0.0/16",
+          "192.168.68.17",
+          "192.168.68.18",
+          "192.168.68.19",
+          "192.168.68.20"
+        ],
         "controlUi": {
           "enabled": true,
           "allowedOrigins": [
@@ -37,24 +45,24 @@ data:
                 "name": "Gemma4 12B (fast)",
                 "reasoning": false,
                 "input": ["text"],
-                "contextWindow": 4096,
-                "maxTokens": 2048
+                "contextWindow": 32768,
+                "maxTokens": 4096
               },
               {
                 "id": "gemma4:12b-think",
                 "name": "Gemma4 12B Think",
                 "reasoning": true,
                 "input": ["text"],
-                "contextWindow": 4096,
-                "maxTokens": 2048
+                "contextWindow": 32768,
+                "maxTokens": 4096
               },
               {
                 "id": "qwen3.5:9b",
                 "name": "Qwen3.5 9B",
                 "reasoning": false,
                 "input": ["text"],
-                "contextWindow": 4096,
-                "maxTokens": 2048
+                "contextWindow": 32768,
+                "maxTokens": 4096
               }
             ]
           }
@@ -64,9 +72,15 @@ data:
         "defaults": {
           "workspace": "~/.openclaw/workspace",
           "model": { "primary": "litellm/gemma4:12b" },
+          "contextTokens": 32768,
+          "bootstrapMaxChars": 4000,
           "userTimezone": "UTC",
           "timeoutSeconds": 600,
-          "maxConcurrent": 1
+          "maxConcurrent": 1,
+          "compaction": {
+            "mode": "default",
+            "reserveTokensFloor": 8192
+          }
         },
         "list": [
           {
