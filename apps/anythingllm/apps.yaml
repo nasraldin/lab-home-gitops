@@ -21,6 +21,8 @@ spec:
           STORAGE_DIR: /app/server/storage
           UID: "1000"
           GID: "1000"
+          # Required — without this chat fails with LanceDB::Invalid ENV settings
+          VECTOR_DB: lancedb
           # Native LiteLLM provider → in-cluster gateway → Ollama.
           LLM_PROVIDER: litellm
           LITE_LLM_BASE_PATH: "http://litellm.litellm.svc.cluster.local:4000"

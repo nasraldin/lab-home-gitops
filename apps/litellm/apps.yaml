@@ -71,9 +71,7 @@ spec:
               workload: apps
         proxy_config:
           model_list:
-            # Ollama on ai-01. reasoning_effort=none maps to think:false on Ollama /v1
-            # (plain think:false + low max_tokens often returns empty content).
-            # Keep num_ctx modest — default 262k context thrashes on iGPU.
+            # Default: fast, no thinking (LibreChat/AnythingLLM/Open WebUI).
             - model_name: gemma4:12b
               litellm_params:
                 model: openai/gemma4:12b
@@ -81,7 +79,7 @@ spec:
                 api_key: ollama
                 extra_body:
                   reasoning_effort: none
-                num_ctx: 8192
+                num_ctx: 4096
             - model_name: gemma4-12b
               litellm_params:
                 model: openai/gemma4:12b
@@ -89,7 +87,16 @@ spec:
                 api_key: ollama
                 extra_body:
                   reasoning_effort: none
-                num_ctx: 8192
+                num_ctx: 4096
+            # Explicit thinking model — pick this in the UI model dropdown when you want it.
+            - model_name: gemma4:12b-think
+              litellm_params:
+                model: openai/gemma4:12b
+                api_base: http://192.168.68.24:11434/v1
+                api_key: ollama
+                extra_body:
+                  reasoning_effort: high
+                num_ctx: 4096
           litellm_settings:
             drop_params: true
           general_settings:
