@@ -54,7 +54,7 @@ spec:
           logs: { type: stdout, format: pretty, level: http }
   destination:
     server: https://kubernetes.default.svc
-    namespace: verdaccio
+    namespace: artifacts
   syncPolicy:
     automated:
       prune: true

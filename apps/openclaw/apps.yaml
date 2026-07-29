@@ -15,7 +15,7 @@ spec:
     path: workloads/ai/openclaw
   destination:
     server: https://kubernetes.default.svc
-    namespace: ai
+    namespace: ai-tools
   syncPolicy:
     automated:
       prune: true

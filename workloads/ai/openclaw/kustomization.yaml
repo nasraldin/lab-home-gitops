@@ -2,7 +2,7 @@
 # Upstream: https://docs.openclaw.ai/install/kubernetes
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: ai
+namespace: ai-tools
 resources:
   - namespace.yaml
   - secret.yaml

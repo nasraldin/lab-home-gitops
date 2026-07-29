@@ -12,28 +12,50 @@ everything else syncs from this repository.
 | ------------------ | ----------------------------------------------------------------------- |
 | `bootstrap/`       | Root Application → `clusters/single`                                    |
 | `clusters/single/` | Platform Application lists                                              |
-| `platform/`        | cert-manager, Longhorn, Kyverno, secrets bootstrap, Keycloak, Harbor, … |
-| `apps/`            | Your workloads                                                          |
+| `platform/`        | Namespaces, security, storage, database, artifacts, observability, …    |
+| `apps/`            | Workloads (AI tools + app-of-apps)                                      |
+| `docs/`            | [Namespace taxonomy](docs/namespace-taxonomy.md)                        |
+
+## Namespaces (few, purpose-grouped)
+
+| Namespace       | Contents                                      |
+| --------------- | --------------------------------------------- |
+| `ai-tools`      | n8n, LibreChat, LiteLLM, OpenClaw             |
+| `observability` | Prometheus, Grafana, Loki, Tempo, OTel        |
+| `database`      | CNPG + Redis/RabbitMQ/MariaDB operators       |
+| `artifacts`     | Harbor, Verdaccio                             |
+| `storage`       | Longhorn                                      |
+| `security`      | cert-manager, Kyverno, ESO, Infisical operator|
+| `gitops`        | GitLab Runner, KEDA                           |
+| `apps`          | Keycloak/Sonar (interim) + future services    |
+| `argocd`        | Argo CD control plane (kept; see taxonomy doc)|
+
+Full mapping and PVC cutover: [docs/namespace-taxonomy.md](docs/namespace-taxonomy.md).
 
 ## Sync order (waves)
 
-1. cert-manager
-2. metrics-server
-3. external-secrets + Infisical operator
-4. Kyverno + Audit policies + Infisical bootstrap hint
-5. keda
-6. longhorn
-7. data operators (CNPG, Redis, RabbitMQ, MariaDB)
-8. keycloak, sonarqube (InfisicalSecret CRs in-path)
-9. harbor (Trivy on), verdaccio
-10. observability (Prometheus, Grafana, Loki, Tempo, **OTel Collector**)
-11. gitlab-runner + KEDA
+1. Canonical namespaces (`platform/namespaces`)
+2. cert-manager → `security`
+3. metrics-server → `kube-system`
+4. external-secrets + Infisical operator → `security`
+5. Kyverno + policies + Infisical bootstrap hint → `security`
+6. KEDA → `gitops`
+7. Longhorn → `storage`
+8. Data operators + CNPG cluster → `database`
+9. Keycloak, SonarQube → `apps` (InfisicalSecret CRs in-path)
+10. Harbor, Verdaccio → `artifacts`
+11. Observability → `observability`
+12. GitLab Runner → `gitops`
+13. AI apps → `ai-tools`
 
 OTLP endpoint (after sync): `http://otel-collector.observability.svc:4318`
 (LAN LB `.110`). See [OpenTelemetry](https://nasraldin.github.io/dev-homelab/architecture/opentelemetry).
 
+LiteLLM in-cluster: `http://litellm.ai-tools.svc.cluster.local:4000/v1`
+
 Secrets: [Infisical](https://nasraldin.github.io/dev-homelab/architecture/secrets-and-infisical) —
 seed from `lab-home-k8s` ansible, sync via InfisicalSecret CRs.
+Auth Secret lives in `security` (`infisical-universal-auth`).
 
 Supply chain: [docs](https://nasraldin.github.io/dev-homelab/architecture/supply-chain) —
 Kyverno Audit first; Cosign Enforce after CI signs Harbor images.

@@ -15,6 +15,7 @@ data:
           "mode": "token"
         },
         "trustedProxies": [
+          "192.168.68.21",
           "192.168.68.14",
           "10.244.0.0/16",
           "192.168.68.17",
@@ -35,7 +36,7 @@ data:
       "models": {
         "providers": {
           "litellm": {
-            "baseUrl": "http://litellm.litellm.svc.cluster.local:4000/v1",
+            "baseUrl": "http://litellm.ai-tools.svc.cluster.local:4000/v1",
             "apiKey": "${LITELLM_API_KEY}",
             "api": "openai-completions",
             "request": { "allowPrivateNetwork": true },
@@ -116,7 +117,7 @@ data:
   AGENTS.md: |
     # OpenClaw (lab)
 
-    You are the lab AI assistant. Models run via LiteLLM → Ollama on ai-01.
+    You are the lab AI assistant. Models run via LiteLLM → Ollama on llm-01.
 
     Prefer existing lab services (LiteLLM, LibreChat, n8n, Stalwart) before inventing new ones.
     Keep answers concise unless the operator asks for depth.

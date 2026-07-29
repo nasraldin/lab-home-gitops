@@ -1,6 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: platform-namespaces
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
+    targetRevision: HEAD
+    path: platform/namespaces
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: platform-cert-manager
   namespace: argocd
   annotations:
@@ -32,7 +55,7 @@ spec:
               memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -106,7 +129,7 @@ spec:
               memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-secrets
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -132,7 +155,7 @@ spec:
       releaseName: infisical-operator
   destination:
     server: https://kubernetes.default.svc
-    namespace: infisical-operator-system
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -176,7 +199,7 @@ spec:
             tag: "v1.32.3"
   destination:
     server: https://kubernetes.default.svc
-    namespace: kyverno
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -200,7 +223,7 @@ spec:
     path: platform/kyverno
   destination:
     server: https://kubernetes.default.svc
-    namespace: kyverno
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -223,7 +246,7 @@ spec:
     path: platform/secrets
   destination:
     server: https://kubernetes.default.svc
-    namespace: infisical-operator-system
+    namespace: security
   syncPolicy:
     automated:
       prune: true
@@ -255,7 +278,7 @@ spec:
           replicaCount: 1
   destination:
     server: https://kubernetes.default.svc
-    namespace: keda
+    namespace: gitops
   syncPolicy:
     automated:
       prune: true
@@ -296,7 +319,7 @@ spec:
             loadBalancerIP: 192.168.68.104
   destination:
     server: https://kubernetes.default.svc
-    namespace: longhorn-system
+    namespace: storage
   syncPolicy:
     automated:
       prune: true
@@ -322,7 +345,7 @@ spec:
       include: "storageclass-1r.yaml"
   destination:
     server: https://kubernetes.default.svc
-    namespace: longhorn-system
+    namespace: storage
   syncPolicy:
     automated:
       prune: true
@@ -343,7 +366,7 @@ spec:
     path: platform/data
   destination:
     server: https://kubernetes.default.svc
-    namespace: data-system
+    namespace: database
   syncPolicy:
     automated:
       prune: true
@@ -366,7 +389,7 @@ spec:
     path: platform/keycloak
   destination:
     server: https://kubernetes.default.svc
-    namespace: keycloak
+    namespace: apps
   syncPolicy:
     automated:
       prune: true
@@ -389,7 +412,7 @@ spec:
     path: platform/sonarqube
   destination:
     server: https://kubernetes.default.svc
-    namespace: sonarqube
+    namespace: apps
   syncPolicy:
     automated:
       prune: true
@@ -412,7 +435,7 @@ spec:
     path: platform/harbor
   destination:
     server: https://kubernetes.default.svc
-    namespace: harbor
+    namespace: artifacts
   syncPolicy:
     automated:
       prune: true
@@ -435,7 +458,7 @@ spec:
     path: platform/verdaccio
   destination:
     server: https://kubernetes.default.svc
-    namespace: verdaccio
+    namespace: artifacts
   syncPolicy:
     automated:
       prune: true
@@ -481,7 +504,7 @@ spec:
     path: platform/gitlab-runner
   destination:
     server: https://kubernetes.default.svc
-    namespace: gitlab-runner
+    namespace: gitops
   syncPolicy:
     automated:
       prune: true

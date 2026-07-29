@@ -5,9 +5,10 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: data
+  name: database
   labels:
     app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/role: database
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 ---
@@ -15,7 +16,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres
-  namespace: data
+  namespace: database
   annotations:
     argocd.argoproj.io/sync-wave: "10"
 spec:
@@ -59,7 +60,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: postgres-init-databases
-  namespace: data
+  namespace: database
   annotations:
     argocd.argoproj.io/sync-wave: "20"
     argocd.argoproj.io/hook: Sync
@@ -82,7 +83,7 @@ spec:
               memory: 64Mi
           env:
             - name: PGHOST
-              value: postgres-rw.data.svc.cluster.local
+              value: postgres-rw.database.svc.cluster.local
             - name: PGUSER
               value: postgres
             - name: PGPASSWORD

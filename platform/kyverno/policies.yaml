@@ -27,9 +27,11 @@ spec:
           - resources:
               namespaces:
                 - kube-system
-                - kyverno
                 - argocd
-                - longhorn-system
+                - security
+                - storage
+                - database
+                - gitops
       mutate:
         patchStrategicMerge:
           spec:
@@ -69,12 +71,11 @@ spec:
           - resources:
               namespaces:
                 - kube-system
-                - kyverno
                 - argocd
-                - longhorn-system
-                - cert-manager
-                - infisical-operator-system
-                - external-secrets
+                - security
+                - storage
+                - database
+                - gitops
       validate:
         message: "Using an image tag of 'latest' is not allowed."
         pattern:
@@ -111,15 +112,11 @@ spec:
               namespaces:
                 # Cluster / operator control planes (requests set via mutate or chart)
                 - kube-system
-                - kyverno
                 - argocd
-                - longhorn-system
-                - cert-manager
-                - external-secrets
-                - cnpg-system
-                - infisical-operator-system
-                - gitlab-runner
-                - mariadb-operator
+                - security
+                - storage
+                - database
+                - gitops
       validate:
         message: "CPU and memory resource requests are required."
         pattern:
@@ -157,8 +154,9 @@ spec:
           - resources:
               namespaces:
                 - kube-system
-                - kyverno
-                - longhorn-system
+                - argocd
+                - security
+                - storage
       validate:
         message: "Privileged mode is disallowed."
         pattern:
@@ -192,8 +190,9 @@ spec:
           - resources:
               namespaces:
                 - kube-system
-                - kyverno
-                - longhorn-system
+                - argocd
+                - security
+                - storage
                 # node-exporter DaemonSet requires hostNetwork to scrape node metrics
                 - observability
       validate:
@@ -230,10 +229,9 @@ spec:
           - resources:
               namespaces:
                 - kube-system
-                - kyverno
                 - argocd
-                - longhorn-system
-                - cert-manager
+                - security
+                - storage
       verifyImages:
         - imageReferences:
             - "harbor.nasraldin.com/*"

@@ -32,13 +32,13 @@ spec:
               url = "http://192.168.68.15"
               executor = "kubernetes"
               [runners.kubernetes]
-                namespace = "gitlab-runner"
+                namespace = "gitops"
                 image = "alpine:3.21"
                 cpu_request = "100m"
                 memory_request = "128Mi"
   destination:
     server: https://kubernetes.default.svc
-    namespace: gitlab-runner
+    namespace: gitops
   syncPolicy:
     automated:
       prune: true

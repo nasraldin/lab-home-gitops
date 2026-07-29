@@ -1,4 +1,4 @@
-# n8n → LiteLLM OpenAI creds (http://litellm.litellm.svc.cluster.local:4000/v1)
+# n8n → LiteLLM OpenAI creds (http://litellm.ai-tools.svc.cluster.local:4000/v1)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -23,7 +23,7 @@ spec:
               protocol: "http"
               editor_base_url: "http://n8n.lab/"
               # After login: Credentials → OpenAI
-              #   Base URL: http://litellm.litellm.svc.cluster.local:4000/v1
+              #   Base URL: http://litellm.ai-tools.svc.cluster.local:4000/v1
               #   API key:  sk-lab-litellm-… (see litellm/apps.yaml masterkey)
               #   Model:    gemma4:12b
               # Do not point n8n at Ollama directly — use LiteLLM.
@@ -66,7 +66,7 @@ spec:
           enabled: false
   destination:
     server: https://kubernetes.default.svc
-    namespace: n8n
+    namespace: ai-tools
   syncPolicy:
     automated:
       prune: true

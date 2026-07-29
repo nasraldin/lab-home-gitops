@@ -1,0 +1,75 @@
+# Canonical lab namespaces (few, purpose-grouped).
+# Synced early so CreateNamespace races and bootstrap secrets have a home.
+# System namespaces (kube-system, kube-public, default, cilium-*, argocd) are left alone.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-tools
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: workload
+    lab.nasraldin.com/role: ai-tools
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: database
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: artifacts
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: artifacts
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storage
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: storage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: security
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitops
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: platform
+    lab.nasraldin.com/role: gitops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/tier: workload
+    lab.nasraldin.com/role: apps

@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ai
+  name: ai-tools
   labels:
-    app.kubernetes.io/part-of: lab-ai
+    app.kubernetes.io/part-of: lab-home
+    lab.nasraldin.com/role: ai-tools

@@ -3,3 +3,6 @@
 # Local secret dumps only (not GitOps InfisicalSecret CRs under platform/)
 /secrets/
 *.decrypted.yaml
+
+# Local cutover helpers
+.cutover*

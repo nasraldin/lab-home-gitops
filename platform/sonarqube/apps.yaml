@@ -16,7 +16,7 @@ spec:
         monitoringPasscode: "lab-sonar-monitoring-passcode"
         jdbcOverwrite:
           enabled: true
-          jdbcUrl: jdbc:postgresql://postgres-rw.data.svc.cluster.local:5432/sonar
+          jdbcUrl: jdbc:postgresql://postgres-rw.database.svc.cluster.local:5432/sonar
           jdbcUsername: sonar
           jdbcSecretName: sonarqube-db
           jdbcSecretPasswordKey: password
@@ -45,7 +45,7 @@ spec:
           enabled: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: sonarqube
+    namespace: apps
   syncPolicy:
     automated:
       prune: true
