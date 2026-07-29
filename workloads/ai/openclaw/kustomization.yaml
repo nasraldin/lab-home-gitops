@@ -1,0 +1,12 @@
+# Official OpenClaw Kustomize base (adapted for lab).
+# Upstream: https://docs.openclaw.ai/install/kubernetes
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ai
+resources:
+  - namespace.yaml
+  - secret.yaml
+  - pvc.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml

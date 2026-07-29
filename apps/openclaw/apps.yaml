@@ -1,5 +1,5 @@
-# OpenClaw — community Helm chart → LiteLLM → Ollama
-# Upstream OpenClaw ships Kustomize (not Helm). Chart: serhanekicii/openclaw-helm
+# OpenClaw — official Kubernetes Kustomize (not Helm)
+# Docs: https://docs.openclaw.ai/install/kubernetes
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -9,181 +9,10 @@ metadata:
     argocd.argoproj.io/sync-wave: "62"
 spec:
   project: default
-  sources:
-    - repoURL: https://serhanekicii.github.io/openclaw-helm
-      chart: openclaw
-      targetRevision: 1.5.40
-      helm:
-        releaseName: openclaw
-        values: |
-          app-template:
-            openclawVersion: "2026.7.1"
-            configMode: overwrite
-            skills: []
-            defaultPodOptions:
-              nodeSelector:
-                workload: apps
-              securityContext:
-                fsGroup: 1000
-                fsGroupChangePolicy: OnRootMismatch
-            controllers:
-              main:
-                replicas: 1
-                strategy: Recreate
-                containers:
-                  main:
-                    image:
-                      repository: ghcr.io/openclaw/openclaw
-                      tag: "2026.7.1"
-                      pullPolicy: IfNotPresent
-                    envFrom:
-                      - secretRef:
-                          name: openclaw-env-secret
-                    resources:
-                      requests:
-                        cpu: 200m
-                        memory: 512Mi
-                      limits:
-                        cpu: "2"
-                        memory: 2Gi
-                  chromium:
-                    enabled: true
-                    resources:
-                      requests:
-                        cpu: 50m
-                        memory: 128Mi
-                      limits:
-                        cpu: "1"
-                        memory: 1Gi
-                initContainers:
-                  init-config:
-                    image:
-                      repository: ghcr.io/openclaw/openclaw
-                      tag: "2026.7.1"
-                  init-skills:
-                    image:
-                      repository: ghcr.io/openclaw/openclaw
-                      tag: "2026.7.1"
-            configMaps:
-              config:
-                enabled: true
-                data:
-                  openclaw.json: |
-                    {
-                      "models": {
-                        "providers": {
-                          "litellm": {
-                            "baseUrl": "http://litellm.litellm.svc.cluster.local:4000/v1",
-                            "apiKey": "${LITELLM_API_KEY}",
-                            "api": "openai-completions",
-                            "request": { "allowPrivateNetwork": true },
-                            "models": [
-                              {
-                                "id": "gemma4:12b",
-                                "name": "Gemma4 12B (fast)",
-                                "reasoning": false,
-                                "input": ["text"],
-                                "contextWindow": 4096,
-                                "maxTokens": 2048
-                              },
-                              {
-                                "id": "gemma4:12b-think",
-                                "name": "Gemma4 12B Think",
-                                "reasoning": true,
-                                "input": ["text"],
-                                "contextWindow": 4096,
-                                "maxTokens": 2048
-                              },
-                              {
-                                "id": "qwen3.5:9b",
-                                "name": "Qwen3.5 9B",
-                                "reasoning": false,
-                                "input": ["text"],
-                                "contextWindow": 4096,
-                                "maxTokens": 2048
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      "agents": {
-                        "defaults": {
-                          "workspace": "/home/node/.openclaw/workspace",
-                          "model": { "primary": "litellm/gemma4:12b" },
-                          "userTimezone": "UTC",
-                          "timeoutSeconds": 600,
-                          "maxConcurrent": 1
-                        },
-                        "list": [
-                          {
-                            "id": "main",
-                            "default": true,
-                            "identity": { "name": "OpenClaw", "emoji": "🦞" }
-                          }
-                        ]
-                      },
-                      "gateway": {
-                        "port": 18789,
-                        "mode": "local",
-                        "bind": "lan",
-                        "controlUi": {
-                          "allowedOrigins": [
-                            "http://openclaw.lab",
-                            "http://192.168.68.113:18789"
-                          ]
-                        }
-                      },
-                      "browser": {
-                        "enabled": true,
-                        "defaultProfile": "default",
-                        "profiles": {
-                          "default": {
-                            "cdpUrl": "http://localhost:9222",
-                            "color": "#4285F4"
-                          }
-                        }
-                      },
-                      "session": {
-                        "scope": "per-sender",
-                        "store": "/home/node/.openclaw/sessions",
-                        "reset": { "mode": "idle", "idleMinutes": 60 }
-                      },
-                      "logging": {
-                        "level": "info",
-                        "consoleLevel": "info",
-                        "consoleStyle": "compact",
-                        "redactSensitive": "tools"
-                      },
-                      "tools": {
-                        "profile": "full",
-                        "web": {
-                          "search": { "enabled": false },
-                          "fetch": { "enabled": true }
-                        }
-                      }
-                    }
-            service:
-              main:
-                controller: main
-                type: LoadBalancer
-                annotations:
-                  lbipam.cilium.io/ips: "192.168.68.113"
-                ipFamilyPolicy: SingleStack
-                ipFamilies:
-                  - IPv4
-                ports:
-                  http:
-                    port: 18789
-            persistence:
-              data:
-                enabled: true
-                type: persistentVolumeClaim
-                accessMode: ReadWriteOnce
-                size: 2Gi
-                storageClass: longhorn-1r
-    - repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
-      targetRevision: HEAD
-      path: workloads/ai/openclaw
+  source:
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
+    targetRevision: HEAD
+    path: workloads/ai/openclaw
   destination:
     server: https://kubernetes.default.svc
     namespace: ai
@@ -193,3 +22,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true

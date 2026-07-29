@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openclaw-config
+  labels:
+    app: openclaw
+data:
+  openclaw.json: |
+    {
+      "gateway": {
+        "mode": "local",
+        "bind": "lan",
+        "port": 18789,
+        "auth": {
+          "mode": "token"
+        },
+        "controlUi": {
+          "enabled": true,
+          "allowedOrigins": [
+            "http://openclaw.lab",
+            "http://192.168.68.113:18789"
+          ],
+          "allowInsecureAuth": true,
+          "dangerouslyDisableDeviceAuth": true
+        }
+      },
+      "models": {
+        "providers": {
+          "litellm": {
+            "baseUrl": "http://litellm.litellm.svc.cluster.local:4000/v1",
+            "apiKey": "${LITELLM_API_KEY}",
+            "api": "openai-completions",
+            "request": { "allowPrivateNetwork": true },
+            "models": [
+              {
+                "id": "gemma4:12b",
+                "name": "Gemma4 12B (fast)",
+                "reasoning": false,
+                "input": ["text"],
+                "contextWindow": 4096,
+                "maxTokens": 2048
+              },
+              {
+                "id": "gemma4:12b-think",
+                "name": "Gemma4 12B Think",
+                "reasoning": true,
+                "input": ["text"],
+                "contextWindow": 4096,
+                "maxTokens": 2048
+              },
+              {
+                "id": "qwen3.5:9b",
+                "name": "Qwen3.5 9B",
+                "reasoning": false,
+                "input": ["text"],
+                "contextWindow": 4096,
+                "maxTokens": 2048
+              }
+            ]
+          }
+        }
+      },
+      "agents": {
+        "defaults": {
+          "workspace": "~/.openclaw/workspace",
+          "model": { "primary": "litellm/gemma4:12b" },
+          "userTimezone": "UTC",
+          "timeoutSeconds": 600,
+          "maxConcurrent": 1
+        },
+        "list": [
+          {
+            "id": "main",
+            "default": true,
+            "name": "OpenClaw",
+            "workspace": "~/.openclaw/workspace",
+            "identity": { "name": "OpenClaw", "emoji": "🦞" }
+          }
+        ]
+      },
+      "browser": { "enabled": false },
+      "cron": { "enabled": false },
+      "session": {
+        "scope": "per-sender",
+        "store": "~/.openclaw/sessions",
+        "reset": { "mode": "idle", "idleMinutes": 60 }
+      },
+      "tools": {
+        "profile": "coding",
+        "web": {
+          "search": { "enabled": false },
+          "fetch": { "enabled": true }
+        }
+      },
+      "logging": {
+        "level": "info",
+        "consoleLevel": "info",
+        "consoleStyle": "compact",
+        "redactSensitive": "tools"
+      }
+    }
+  AGENTS.md: |
+    # OpenClaw (lab)
+
+    You are the lab AI assistant. Models run via LiteLLM → Ollama on ai-01.
+
+    Prefer existing lab services (LiteLLM, LibreChat, n8n, Stalwart) before inventing new ones.
+    Keep answers concise unless the operator asks for depth.
