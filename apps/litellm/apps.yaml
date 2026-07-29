@@ -71,16 +71,27 @@ spec:
               workload: apps
         proxy_config:
           model_list:
-            # Ollama runs on ai-01 (192.168.68.24), not a k8s worker.
+            # Ollama on ai-01. Prefer OpenAI-compatible /v1 + think:false so gemma4
+            # does not burn tokens on hidden reasoning (fixes empty LibreChat replies).
+            # Keep num_ctx modest — default 262k context thrashes on iGPU/CPU.
             - model_name: gemma4:12b
               litellm_params:
-                model: ollama/gemma4:12b
-                api_base: http://192.168.68.24:11434
-            # Alias for OpenAI-style clients that expect a generic name
+                model: openai/gemma4:12b
+                api_base: http://192.168.68.24:11434/v1
+                api_key: ollama
+                extra_body:
+                  think: false
+                num_ctx: 8192
             - model_name: gemma4-12b
               litellm_params:
-                model: ollama/gemma4:12b
-                api_base: http://192.168.68.24:11434
+                model: openai/gemma4:12b
+                api_base: http://192.168.68.24:11434/v1
+                api_key: ollama
+                extra_body:
+                  think: false
+                num_ctx: 8192
+          litellm_settings:
+            drop_params: true
           general_settings:
             master_key: os.environ/PROXY_MASTER_KEY
         migrationJob:

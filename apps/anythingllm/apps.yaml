@@ -28,8 +28,9 @@ spec:
           LITE_LLM_MODEL_PREF: "gemma4:12b"
           EMBEDDING_ENGINE: native
         persistentVolume:
-          size: 8Gi
-          storageClass: longhorn
+          # 1 replica — cluster Longhorn is near soft capacity with 2× replicas.
+          size: 2Gi
+          storageClass: longhorn-1r
           mountPath: /app/server/storage
         service:
           type: LoadBalancer

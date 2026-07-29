@@ -33,8 +33,8 @@ spec:
             ALLOW_UNVERIFIED_EMAIL_LOGIN: "true"
             ALLOW_SOCIAL_LOGIN: "false"
             ALLOW_SOCIAL_REGISTRATION: "false"
-            DOMAIN_CLIENT: "http://chat.lab:3080"
-            DOMAIN_SERVER: "http://chat.lab:3080"
+            DOMAIN_CLIENT: "http://chat.lab"
+            DOMAIN_SERVER: "http://chat.lab"
           configYamlContent: |
             version: 1.2.1
             cache: true
