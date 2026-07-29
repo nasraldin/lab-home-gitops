@@ -30,12 +30,17 @@ spec:
             [[runners]]
               name = "k8s-autoscaled"
               url = "http://192.168.68.15"
+              # Clone via LAN IP so job pods work even when gitlab.lab DNS drifts mid-cutover.
+              clone_url = "http://192.168.68.15"
               executor = "kubernetes"
               [runners.kubernetes]
                 namespace = "gitops"
                 image = "alpine:3.21"
                 cpu_request = "100m"
                 memory_request = "128Mi"
+              [[runners.kubernetes.host_aliases]]
+                ip = "192.168.68.15"
+                hostnames = ["gitlab.lab", "gitlab.nasraldin.com"]
   destination:
     server: https://kubernetes.default.svc
     namespace: gitops
