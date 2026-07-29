@@ -342,7 +342,7 @@ spec:
     targetRevision: HEAD
     path: platform/longhorn
     directory:
-      include: "storageclass-1r.yaml"
+      include: "{storageclass-1r.yaml,csi-backend-alias.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: storage

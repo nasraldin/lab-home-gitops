@@ -1,0 +1,52 @@
+# Bridge for leftover CSI plugins still running in longhorn-system after
+# Longhorn Helm destination moved to `storage`. Without these, kubelet
+# MountDevice fails with: lookup longhorn-backend on CoreDNS: no such host.
+# Remove once longhorn-system CSI DaemonSets/Deployments are fully gone and
+# only storage-namespace CSI serves driver.longhorn.io.
+apiVersion: v1
+kind: Service
+metadata:
+  name: longhorn-backend
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    app.kubernetes.io/component: longhorn-csi-bridge
+spec:
+  type: ExternalName
+  externalName: longhorn-backend.storage.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: longhorn-admission-webhook
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    app.kubernetes.io/component: longhorn-csi-bridge
+spec:
+  type: ExternalName
+  externalName: longhorn-admission-webhook.storage.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: longhorn-conversion-webhook
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    app.kubernetes.io/component: longhorn-csi-bridge
+spec:
+  type: ExternalName
+  externalName: longhorn-conversion-webhook.storage.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: longhorn-recovery-backend
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/part-of: lab-home
+    app.kubernetes.io/component: longhorn-csi-bridge
+spec:
+  type: ExternalName
+  externalName: longhorn-recovery-backend.storage.svc.cluster.local
