@@ -12,7 +12,7 @@ spec:
     helm:
       releaseName: gitlab-runner
       values: |
-        gitlabUrl: http://gitlab.lab
+        gitlabUrl: http://192.168.68.15
         rbac:
           create: true
         resources:
@@ -24,7 +24,7 @@ spec:
           config: |
             [[runners]]
               name = "k8s-autoscaled"
-              url = "http://gitlab.lab"
+              url = "http://192.168.68.15"
               executor = "kubernetes"
               [runners.kubernetes]
                 namespace = "gitlab-runner"
