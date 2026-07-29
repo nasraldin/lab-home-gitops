@@ -73,3 +73,5 @@ metadata:
     app.kubernetes.io/part-of: lab-home
     lab.nasraldin.com/tier: workload
     lab.nasraldin.com/role: apps
+
+# CI: ensure kubeconform exercises platform paths after template fixes
