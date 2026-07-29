@@ -45,6 +45,14 @@ spec:
           deployStandalone: true
           useExisting: false
         postgresql:
+          # Bitnami moved versioned tags to docker.io/bitnamilegacy (Aug 2025).
+          global:
+            security:
+              allowInsecureImages: true
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/postgresql
+            tag: 16.2.0-debian-12-r6
           architecture: standalone
           auth:
             username: litellm
@@ -52,6 +60,10 @@ spec:
             password: "W4OeTqjNQ1VV2NKCh2HJ50jvZ8mARNga"
             postgres-password: "acdc08be1724170a9275042a45bfdcbf"
           primary:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
             persistence:
               storageClass: longhorn
               size: 8Gi
@@ -59,15 +71,16 @@ spec:
               workload: apps
         proxy_config:
           model_list:
+            # Ollama runs on ai-01 (192.168.68.24), not a k8s worker.
             - model_name: gemma4:12b
               litellm_params:
                 model: ollama/gemma4:12b
-                api_base: http://192.168.68.20:11434
+                api_base: http://192.168.68.24:11434
             # Alias for OpenAI-style clients that expect a generic name
             - model_name: gemma4-12b
               litellm_params:
                 model: ollama/gemma4:12b
-                api_base: http://192.168.68.20:11434
+                api_base: http://192.168.68.24:11434
           general_settings:
             master_key: os.environ/PROXY_MASTER_KEY
         migrationJob:

@@ -12,18 +12,27 @@ spec:
     helm:
       releaseName: keycloak
       values: |
+        # Bitnami moved versioned tags to docker.io/bitnamilegacy (Aug 2025).
+        global:
+          security:
+            allowInsecureImages: true
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/keycloak
+          tag: 26.3.3-debian-12-r0
         production: true
-        proxy: edge
+        # Required with production=true when TLS terminates at Cloudflare / edge proxy.
+        proxyHeaders: xforwarded
         httpRelativePath: /
         hostname: id.nasraldin.com
-        hostnameStrict: true
+        hostnameStrict: false
+        hostnameBackchannelDynamic: true
         service:
           type: LoadBalancer
           loadBalancerIP: 192.168.68.103
         ingress:
           enabled: false
         # Admin + DB passwords from Infisical (platform/secrets InfisicalSecret CRs).
-        # Bootstrap: seed Infisical, create machine-identity Secret, wait for sync.
         auth:
           adminUser: admin
           existingSecret: keycloak-admin
@@ -37,6 +46,12 @@ spec:
           database: keycloak
           existingSecret: keycloak-db
           existingSecretPasswordKey: password
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak
@@ -46,3 +61,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

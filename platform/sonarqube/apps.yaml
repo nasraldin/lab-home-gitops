@@ -12,12 +12,37 @@ spec:
     helm:
       releaseName: sonarqube
       values: |
+        # Required by chart validation (not a login password).
+        monitoringPasscode: "lab-sonar-monitoring-passcode"
         jdbcOverwrite:
           enabled: true
           jdbcUrl: jdbc:postgresql://postgres-rw.data.svc.cluster.local:5432/sonar
           jdbcUsername: sonar
           jdbcSecretName: sonarqube-db
           jdbcSecretPasswordKey: password
+        postgresql:
+          enabled: false
+        service:
+          type: LoadBalancer
+          externalPort: 80
+          internalPort: 9000
+          annotations:
+            lbipam.cilium.io/ips: "192.168.68.112"
+        ingress:
+          enabled: false
+        persistence:
+          enabled: true
+          storageClass: longhorn
+          size: 10Gi
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1Gi
+          limits:
+            memory: 2Gi
+        # Homelab: skip community build edition checks that block empty passcode.
+        community:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: sonarqube
@@ -27,3 +52,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

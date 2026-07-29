@@ -12,7 +12,10 @@ spec:
     helm:
       releaseName: verdaccio
       values: |
-        # Public/LAN: npm.nasraldin.com / npm.lab (not Nginx Proxy Manager)
+        # LAN / CI: http://npm.lab — open for install (no Cloudflare Access).
+        # Public: https://npm.nasraldin.com — gated by Cloudflare Access OTP
+        # (cloudflare-tunnel bootstrap). Keeps project npm usage simple on LAN
+        # while blocking anonymous internet traffic / scrape load.
         service:
           type: LoadBalancer
           loadBalancerIP: 192.168.68.106
@@ -26,6 +29,29 @@ spec:
             memory: 128Mi
           limits:
             memory: 256Mi
+        # Publish requires auth; anonymous can still install + proxy npmjs on LAN.
+        configMap: |
+          storage: file
+          auth:
+            htpasswd:
+              file: ./htpasswd
+              max_users: 100
+          uplinks:
+            npmjs:
+              url: https://registry.npmjs.org/
+          packages:
+            "@*/*":
+              access: $all
+              publish: $authenticated
+              proxy: npmjs
+            "**":
+              access: $all
+              publish: $authenticated
+              proxy: npmjs
+          middlewares:
+            audit:
+              enabled: true
+          logs: { type: stdout, format: pretty, level: http }
   destination:
     server: https://kubernetes.default.svc
     namespace: verdaccio

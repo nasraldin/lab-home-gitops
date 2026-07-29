@@ -18,15 +18,27 @@ spec:
         main:
           config:
             n8n:
-              host: "192.168.68.107"
+              host: "n8n.lab"
               port: 5678
               protocol: "http"
-              editor_base_url: "http://192.168.68.107/"
+              editor_base_url: "http://n8n.lab/"
               # After login: Credentials → OpenAI
               #   Base URL: http://litellm.litellm.svc.cluster.local:4000/v1
               #   API key:  sk-lab-litellm-… (see litellm/apps.yaml masterkey)
               #   Model:    gemma4:12b
               # Do not point n8n at Ollama directly — use LiteLLM.
+          extraEnv:
+            # LAN *.lab is HTTP; without this the UI refuses non-HTTPS cookies.
+            N8N_SECURE_COOKIE:
+              value: "false"
+            N8N_HOST:
+              value: "n8n.lab"
+            N8N_PROTOCOL:
+              value: "http"
+            N8N_EDITOR_BASE_URL:
+              value: "http://n8n.lab/"
+            WEBHOOK_URL:
+              value: "http://n8n.lab/"
           secret:
             n8n:
               encryption_key: "kNiWWEJd49Ev0eaAZ/DWXfkvJZwKwx4nBcvnl+QYcyo="

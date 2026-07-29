@@ -55,4 +55,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
+      # Chart Deployment.strategy conflicts with ServerSideApply typed patch.
