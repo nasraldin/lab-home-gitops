@@ -27,6 +27,14 @@ spec:
             JWT_SECRET: "2fa7fb891f8bd451088f2860c88375db30230d30494be9f48f348ec73641d6ff"
             JWT_REFRESH_SECRET: "b0469a0ec97a5be13c8e77478811b0429bb289d8f40d65082d8a5afc00e9be5b"
             MEILI_MASTER_KEY: "a15954f65493b9ef7dd076dcaf55392cebb53c7a25f909a51e66b4e87a161c6d"
+            # Homelab: first visit creates the admin via Sign up (not a seeded password).
+            ALLOW_EMAIL_LOGIN: "true"
+            ALLOW_REGISTRATION: "true"
+            ALLOW_UNVERIFIED_EMAIL_LOGIN: "true"
+            ALLOW_SOCIAL_LOGIN: "false"
+            ALLOW_SOCIAL_REGISTRATION: "false"
+            DOMAIN_CLIENT: "http://chat.lab:3080"
+            DOMAIN_SERVER: "http://chat.lab:3080"
           configYamlContent: |
             version: 1.2.1
             cache: true
