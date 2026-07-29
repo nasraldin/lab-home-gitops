@@ -165,13 +165,11 @@ spec:
           replicas: 1
         reportsController:
           replicas: 1
-        # bitnami/kubectl tags were removed from docker.io; use official kubectl for hooks
-        webhooksCleanup:
-          image:
-            registry: registry.k8s.io
-            repository: kubectl
-            tag: "v1.32.3"
+        # bitnami/kubectl was removed from docker.io; use official kubectl for hooks.
+        # Disable one-shot policyReportsCleanup so upgrades cannot leave ImagePullBackOff jobs.
         policyReportsCleanup:
+          enabled: false
+        webhooksCleanup:
           image:
             registry: registry.k8s.io
             repository: kubectl

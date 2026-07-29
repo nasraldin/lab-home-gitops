@@ -19,6 +19,11 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
+        hostAliases:
+          - ip: "192.168.68.15"
+            hostnames:
+              - gitlab.lab
+              - gitlab.nasraldin.com
         runners:
           secret: gitlab-runner-token
           config: |
