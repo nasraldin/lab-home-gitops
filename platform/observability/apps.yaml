@@ -189,6 +189,12 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
+        # Rules sidecar (kiwigrid/k8s-sidecar) has empty resources by default.
+        sidecar:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
         lokiCanary:
           enabled: false
         test:

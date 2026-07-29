@@ -33,16 +33,17 @@ spec:
       mutate:
         patchStrategicMerge:
           spec:
+            # +(requests) creates the map when charts set resources: {} (Harbor init, etc.)
             containers:
               - (name): "*"
                 resources:
-                  requests:
+                  +(requests):
                     +(cpu): "50m"
                     +(memory): "64Mi"
             =(initContainers):
               - (name): "*"
                 resources:
-                  requests:
+                  +(requests):
                     +(cpu): "50m"
                     +(memory): "64Mi"
 ---
@@ -91,6 +92,10 @@ metadata:
     policies.kyverno.io/title: Require resource requests
     policies.kyverno.io/category: Best Practices
     policies.kyverno.io/severity: medium
+    # Pod-only: autogen on Deployment/ReplicaSet fails forever on old revision
+    # history (desired=0) even after Helm values add requests to the live template.
+    # Mutate already injects requests at Pod admit; Audit validates running Pods.
+    pod-policies.kyverno.io/autogen-controllers: none
 spec:
   validationFailureAction: Audit
   background: true
@@ -114,11 +119,17 @@ spec:
                 - cnpg-system
                 - infisical-operator-system
                 - gitlab-runner
+                - mariadb-operator
       validate:
         message: "CPU and memory resource requests are required."
         pattern:
           spec:
             containers:
+              - resources:
+                  requests:
+                    memory: "?*"
+                    cpu: "?*"
+            =(initContainers):
               - resources:
                   requests:
                     memory: "?*"
