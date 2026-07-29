@@ -1,0 +1,24 @@
+# OpenClaw — personal AI agent gateway → LiteLLM → Ollama
+# Lives in namespace `ai` (start of consolidating AI apps under one NS).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-openclaw
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "62"
+spec:
+  project: default
+  source:
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
+    targetRevision: HEAD
+    path: workloads/ai/openclaw
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ai
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

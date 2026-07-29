@@ -47,10 +47,12 @@ spec:
                     default:
                       - "gemma4:12b"
                       - "gemma4:12b-think"
-                    fetch: true
+                      - "qwen3.5:9b"
+                    # false = only the list above (fetch duplicated gemma4-12b alias)
+                    fetch: false
                   titleConvo: true
                   titleModel: "current_model"
-                  modelDisplayLabel: "LiteLLM"
+                  modelDisplayLabel: "Lab"
           imageVolume:
             enabled: true
             size: 10G

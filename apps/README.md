@@ -4,28 +4,33 @@ All chat/RAG/workflow UIs talk to **LiteLLM** (OpenAI-compatible gateway).
 LiteLLM is the only service that calls Ollama on `ai-01`.
 
 ```text
-[LibreChat | AnythingLLM | n8n | Open WebUI]
+[LibreChat | AnythingLLM | n8n | Open WebUI | OpenClaw]
                     │
                     ▼
          LiteLLM :4000  (.108)
                     │
                     ▼
-     Ollama on ai-01 :11434  (gemma4:12b)
-     · 8c / 16 GiB / 150 GiB · 890M VFIO · 2 MiB hugepages
+     Ollama on ai-01 :11434
+     models: gemma4:12b · gemma4:12b-think · qwen3.5:9b
 ```
 
-| App         | LB IP          | Upstream                       |
-| ----------- | -------------- | ------------------------------ |
-| LiteLLM     | 192.168.68.108 | → `http://192.168.68.20:11434` |
-| LibreChat   | 192.168.68.105 | → LiteLLM in-cluster           |
-| AnythingLLM | 192.168.68.106 | → LiteLLM in-cluster           |
-| n8n         | 192.168.68.107 | → LiteLLM (OpenAI cred in UI)  |
-| Open WebUI  | 192.168.68.109 | → LiteLLM in-cluster           |
+| App         | URL / LB                         | Notes                          |
+| ----------- | -------------------------------- | ------------------------------ |
+| LiteLLM     | http://litellm.lab (.108:4000)   | Gateway                        |
+| LibreChat   | http://chat.lab                  | Model dropdown                 |
+| AnythingLLM | http://anythingllm.lab           | RAG                            |
+| Open WebUI  | http://open-webui.lab            |                                |
+| OpenClaw    | http://openclaw.lab (.113:18789) | Agent gateway (`ai` namespace)  |
+| n8n         | http://n8n.lab                   | Workflows                      |
 
-In-cluster base URL: `http://litellm.litellm.svc.cluster.local:4000/v1`  
-LAN base URL: `http://192.168.68.108:4000/v1`  
-API key: LiteLLM `masterkey` (see `litellm/apps.yaml`)  
-Model: `gemma4:12b`
+**Namespace plan:** new AI workloads go in Kubernetes namespace **`ai`** (OpenClaw first).
+Existing apps (`librechat`, `litellm`, …) stay in their own namespaces until a planned
+migration — consolidating them is a cutover, not a rename.
+
+Models (LibreChat dropdown): `gemma4:12b` (fast), `gemma4:12b-think`, `qwen3.5:9b`.
+
+**Hugepages on ai-01:** keep enabled (`hugepages: 2`). Proxmox memory % stays near 0% by
+design; use `free -h` / `ollama ps` inside the guest for real RAM use.
 
 **Prerequisites**
 

@@ -71,7 +71,7 @@ spec:
               workload: apps
         proxy_config:
           model_list:
-            # Default: fast, no thinking (LibreChat/AnythingLLM/Open WebUI).
+            # Distinct IDs for LibreChat dropdown (no duplicate aliases).
             - model_name: gemma4:12b
               litellm_params:
                 model: openai/gemma4:12b
@@ -80,15 +80,6 @@ spec:
                 extra_body:
                   reasoning_effort: none
                 num_ctx: 4096
-            - model_name: gemma4-12b
-              litellm_params:
-                model: openai/gemma4:12b
-                api_base: http://192.168.68.24:11434/v1
-                api_key: ollama
-                extra_body:
-                  reasoning_effort: none
-                num_ctx: 4096
-            # Explicit thinking model — pick this in the UI model dropdown when you want it.
             - model_name: gemma4:12b-think
               litellm_params:
                 model: openai/gemma4:12b
@@ -96,6 +87,14 @@ spec:
                 api_key: ollama
                 extra_body:
                   reasoning_effort: high
+                num_ctx: 4096
+            - model_name: qwen3.5:9b
+              litellm_params:
+                model: openai/qwen3.5:9b
+                api_base: http://192.168.68.24:11434/v1
+                api_key: ollama
+                extra_body:
+                  reasoning_effort: none
                 num_ctx: 4096
           litellm_settings:
             drop_params: true
