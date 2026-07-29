@@ -4,24 +4,22 @@ All chat/RAG/workflow UIs talk to **LiteLLM** (OpenAI-compatible gateway).
 LiteLLM is the only service that calls Ollama on `ai-01`.
 
 ```text
-[LibreChat | AnythingLLM | n8n | Open WebUI | OpenClaw]
-                    │
-                    ▼
-         LiteLLM :4000  (.108)
-                    │
-                    ▼
-     Ollama on ai-01 :11434
-     models: gemma4:12b · gemma4:12b-think · qwen3.5:9b
+[LibreChat | n8n | OpenClaw]
+            │
+            ▼
+     LiteLLM :4000  (.108)
+            │
+            ▼
+ Ollama on ai-01 :11434
+ models: gemma4:12b · gemma4:12b-think · qwen3.5:9b
 ```
 
-| App         | URL / LB                         | Notes                          |
-| ----------- | -------------------------------- | ------------------------------ |
-| LiteLLM     | http://litellm.lab (.108:4000)   | Gateway                        |
-| LibreChat   | http://chat.lab                  | Model dropdown                 |
-| AnythingLLM | http://anythingllm.lab           | RAG                            |
-| Open WebUI  | http://open-webui.lab            |                                |
-| OpenClaw    | http://openclaw.lab (.113:18789) | Agent gateway (`ai` namespace)  |
-| n8n         | http://n8n.lab                   | Workflows                      |
+| App       | URL / LB                         | Notes                         |
+| --------- | -------------------------------- | ----------------------------- |
+| LiteLLM   | http://litellm.lab (.108:4000)   | Gateway                       |
+| LibreChat | http://chat.lab                  | Model dropdown                |
+| OpenClaw  | http://openclaw.lab (.113:18789) | Agent gateway (`ai` namespace) |
+| n8n       | http://n8n.lab                   | Workflows                     |
 
 **Namespace plan:** new AI workloads go in Kubernetes namespace **`ai`** (OpenClaw first).
 Existing apps (`librechat`, `litellm`, …) stay in their own namespaces until a planned
