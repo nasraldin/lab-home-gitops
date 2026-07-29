@@ -1,6 +1,51 @@
-# Kyverno (admission policies) — Audit mode first.
+# Kyverno (admission policies) — Audit validate + mutate defaults.
 # Chart Application lives in clusters/single/platform-apps.yaml.
 # Policies sync from this directory.
+#
+# Design:
+# - Mutate injects CPU/memory requests when charts omit them (day-1 ready).
+# - Validate stays Audit so dashboards still surface pods that somehow skip mutate.
+# - Platform namespaces excluded from validate noise where operators manage pods.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-resource-requests
+  annotations:
+    policies.kyverno.io/title: Add default resource requests
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+spec:
+  background: false
+  rules:
+    - name: add-default-requests
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kyverno
+                - argocd
+                - longhorn-system
+      mutate:
+        patchStrategicMerge:
+          spec:
+            containers:
+              - (name): "*"
+                resources:
+                  requests:
+                    +(cpu): "50m"
+                    +(memory): "64Mi"
+            =(initContainers):
+              - (name): "*"
+                resources:
+                  requests:
+                    +(cpu): "50m"
+                    +(memory): "64Mi"
+---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
@@ -59,10 +104,16 @@ spec:
         any:
           - resources:
               namespaces:
+                # Cluster / operator control planes (requests set via mutate or chart)
                 - kube-system
                 - kyverno
                 - argocd
                 - longhorn-system
+                - cert-manager
+                - external-secrets
+                - cnpg-system
+                - infisical-operator-system
+                - gitlab-runner
       validate:
         message: "CPU and memory resource requests are required."
         pattern:

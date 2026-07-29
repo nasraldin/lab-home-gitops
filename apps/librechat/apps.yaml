@@ -21,6 +21,12 @@ spec:
             existingSecretName: ""
         librechat:
           existingSecretName: ""
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
           configEnv:
             CREDS_KEY: "99104b3cea6452eba70fb6170a664cf0609df2e7b338f9d6a73cbc6e284c653e"
             CREDS_IV: "e3a09d5be019135a610ebbb091707190"
@@ -63,11 +69,19 @@ spec:
             repository: bitnamilegacy/mongodb
           auth:
             enabled: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           persistence:
             storageClass: longhorn
             size: 8Gi
         meilisearch:
           enabled: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
           persistence:
             enabled: true
             storageClass: longhorn

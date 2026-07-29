@@ -15,6 +15,10 @@ spec:
         gitlabUrl: https://gitlab.nasraldin.com
         rbac:
           create: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
         runners:
           secret: gitlab-runner-token
           config: |
@@ -23,7 +27,9 @@ spec:
               executor = "kubernetes"
               [runners.kubernetes]
                 namespace = "gitlab-runner"
-                image = "alpine:latest"
+                image = "alpine:3.21"
+                cpu_request = "100m"
+                memory_request = "128Mi"
   destination:
     server: https://kubernetes.default.svc
     namespace: gitlab-runner

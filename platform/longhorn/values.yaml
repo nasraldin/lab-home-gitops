@@ -1,9 +1,12 @@
+# Longhorn Helm values (mirrored into clusters/single/platform-apps.yaml).
+# Worker data disks: Terraform `data_disk_gb` (700 GiB) mounted at /var/lib/longhorn
+# by ansible role k8s_longhorn_disk before this chart syncs.
 defaultSettings:
-  # Requires ansible role k8s_longhorn_disk (Terraform data_disk_gb mounted at
-  # /var/lib/longhorn) before this chart syncs. Otherwise replicas land on the
-  # ~60Gi OS disk and PVC scheduling fails.
   defaultReplicaCount: 2
   storageOverProvisioningPercentage: 100
+  # Keep most of each data disk schedulable (was 30% by chart default — caused false
+  # "out of capacity" with 100–700 GiB disks that were mostly empty).
+  storageReservedPercentageForDefaultDisk: "5"
 persistence:
   defaultClassReplicaCount: 2
 preUpgradeChecker:

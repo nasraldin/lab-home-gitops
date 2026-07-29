@@ -89,6 +89,21 @@ spec:
       releaseName: external-secrets
       values: |
         installCRDs: true
+        replicaCount: 1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        webhook:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+        certController:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: external-secrets
@@ -257,10 +272,11 @@ spec:
       releaseName: longhorn
       values: |
         defaultSettings:
-          # 3 workers × 100Gi data disks. Replica 2 is fine once data disks are mounted
-          # (ansible role k8s_longhorn_disk). Without data disks, use 1.
+          # 3 workers × 700Gi data disks (Terraform data_disk_gb) → ~2 TiB Longhorn raw.
+          # Replica 2 after ansible role k8s_longhorn_disk mounts /var/lib/longhorn.
           defaultReplicaCount: 2
           storageOverProvisioningPercentage: 100
+          storageReservedPercentageForDefaultDisk: "5"
         persistence:
           defaultClassReplicaCount: 2
         preUpgradeChecker:
@@ -279,6 +295,29 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-longhorn-extras
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "31"
+spec:
+  project: default
+  source:
+    repoURL: http://192.168.68.15/homelab/lab-home-gitops.git
+    targetRevision: HEAD
+    path: platform/longhorn
+    directory:
+      include: "storageclass-1r.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application

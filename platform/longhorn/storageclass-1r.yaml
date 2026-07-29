@@ -1,0 +1,16 @@
+# Single-replica class for lab apps that don't need Longhorn HA
+# (saves capacity; use default `longhorn` for stateful DBs).
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-1r
+  labels:
+    app.kubernetes.io/part-of: lab-home
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: ext4
