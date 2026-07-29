@@ -86,7 +86,7 @@ spec:
   storageClassName: longhorn-1r
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -111,7 +111,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: openclaw
-          image: ghcr.io/openclaw/openclaw:latest
+          image: ghcr.io/openclaw/openclaw:2026.7.1
           imagePullPolicy: IfNotPresent
           command:
             - sh
