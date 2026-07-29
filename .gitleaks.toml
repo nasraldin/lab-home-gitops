@@ -1,0 +1,10 @@
+# Bootstrap / day-0 values still in values YAML pending Infisical migration.
+# Do not add new plaintext secrets here — move them to ExternalSecrets instead.
+title = "lab-home-gitops"
+
+[allowlist]
+description = "Known day-0 app chart values pending secret sync"
+paths = [
+  '''apps/librechat/apps\.yaml''',
+  '''apps/n8n/apps\.yaml''',
+]

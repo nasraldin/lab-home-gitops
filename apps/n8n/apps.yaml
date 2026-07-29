@@ -39,9 +39,10 @@ spec:
               value: "http://n8n.lab/"
             WEBHOOK_URL:
               value: "http://n8n.lab/"
+          # encryption_key from Infisical → Secret n8n-secrets (N8N_ENCRYPTION_KEY).
+          existingSecret: n8n-secrets
           secret:
-            n8n:
-              encryption_key: "kNiWWEJd49Ev0eaAZ/DWXfkvJZwKwx4nBcvnl+QYcyo="
+            n8n: {}
           persistence:
             enabled: true
             type: dynamic

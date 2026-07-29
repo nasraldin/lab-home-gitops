@@ -21,9 +21,11 @@ spec:
         image:
           repository: ghcr.io/berriai/litellm-database
           pullPolicy: IfNotPresent
-        # Lab master key — clients use this as the OpenAI API key.
-        # Rotate for shared/long-lived environments.
-        masterkey: "sk-lab-litellm-59e851e6f6202963a67be3e262a7a647"
+        # Master key from Infisical → Secret litellm-secrets (PROXY_MASTER_KEY).
+        # Chart reads PROXY_MASTER_KEY / masterkey via env; do not commit the value.
+        masterkey: ""
+        environmentSecrets:
+          - litellm-secrets
         service:
           type: LoadBalancer
           port: 4000
@@ -57,8 +59,11 @@ spec:
           auth:
             username: litellm
             database: litellm
-            password: "W4OeTqjNQ1VV2NKCh2HJ50jvZ8mARNga"
-            postgres-password: "acdc08be1724170a9275042a45bfdcbf"
+            # Passwords from Infisical Secret litellm-secrets (POSTGRES_*).
+            existingSecret: litellm-secrets
+            secretKeys:
+              userPasswordKey: POSTGRES_USER_PASSWORD
+              adminPasswordKey: POSTGRES_PASSWORD
           primary:
             resources:
               requests:

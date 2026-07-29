@@ -15,12 +15,12 @@ spec:
     helm:
       releaseName: librechat
       values: |
-        # Lab secrets — rotate after first sync (private GitLab).
+        # Secrets from Infisical → Secret librechat-env (see apps/infisical-secrets.yaml).
         global:
           librechat:
-            existingSecretName: ""
+            existingSecretName: librechat-env
         librechat:
-          existingSecretName: ""
+          existingSecretName: librechat-env
           resources:
             requests:
               cpu: 100m
@@ -28,11 +28,6 @@ spec:
             limits:
               memory: 2Gi
           configEnv:
-            CREDS_KEY: "99104b3cea6452eba70fb6170a664cf0609df2e7b338f9d6a73cbc6e284c653e"
-            CREDS_IV: "e3a09d5be019135a610ebbb091707190"
-            JWT_SECRET: "2fa7fb891f8bd451088f2860c88375db30230d30494be9f48f348ec73641d6ff"
-            JWT_REFRESH_SECRET: "b0469a0ec97a5be13c8e77478811b0429bb289d8f40d65082d8a5afc00e9be5b"
-            MEILI_MASTER_KEY: "a15954f65493b9ef7dd076dcaf55392cebb53c7a25f909a51e66b4e87a161c6d"
             # Homelab: first visit creates the admin via Sign up (not a seeded password).
             ALLOW_EMAIL_LOGIN: "true"
             ALLOW_REGISTRATION: "true"
@@ -47,7 +42,8 @@ spec:
             endpoints:
               custom:
                 - name: "LiteLLM"
-                  apiKey: "sk-lab-litellm-59e851e6f6202963a67be3e262a7a647"
+                  # Resolves from librechat-env (LITELLM_API_KEY); never commit the key.
+                  apiKey: "${LITELLM_API_KEY}"
                   baseURL: "http://litellm.ai-tools.svc.cluster.local:4000/v1"
                   models:
                     default:
@@ -90,11 +86,10 @@ spec:
             enabled: true
             storageClass: longhorn
           auth:
-            existingMasterKeySecret: ""
+            existingMasterKeySecret: librechat-env
           environment:
             MEILI_ENV: production
             MEILI_NO_ANALYTICS: true
-            MEILI_MASTER_KEY: "a15954f65493b9ef7dd076dcaf55392cebb53c7a25f909a51e66b4e87a161c6d"
         librechat-rag-api:
           enabled: false
         redis:
