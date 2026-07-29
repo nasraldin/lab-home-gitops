@@ -6,7 +6,7 @@ metadata:
 spec:
   scaleTargetRef:
     name: gitlab-runner
-  minReplicaCount: 0
+  minReplicaCount: 1
   maxReplicaCount: 5
   pollingInterval: 30
   cooldownPeriod: 300
@@ -16,4 +16,6 @@ spec:
         serverAddress: http://kube-prometheus-stack-prometheus.observability.svc:9090
         metricName: gitlab_runner_jobs
         threshold: "1"
-        query: sum(gitlab_runner_jobs{state="running"})
+        # Scale up when jobs are queued/running. minReplicas=1 avoids chicken-egg
+        # (metrics only exist while the runner is up).
+        query: sum(gitlab_runner_jobs{state=~"running|pending"}) or vector(0)

@@ -69,6 +69,10 @@ spec:
             repository: bitnamilegacy/mongodb
           auth:
             enabled: false
+          # RWO PVC cannot attach to two nodes during RollingUpdate
+          architecture: standalone
+          updateStrategy:
+            type: Recreate
           resources:
             requests:
               cpu: 100m

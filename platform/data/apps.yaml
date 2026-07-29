@@ -122,6 +122,33 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
 ---
+# CRDs must be installed separately (operator chart has crds.enabled=false by default).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mariadb-operator-crds
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "39"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.mariadb.com/mariadb-operator
+    chart: mariadb-operator-crds
+    targetRevision: 25.10.4
+    helm:
+      releaseName: mariadb-operator-crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mariadb-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
