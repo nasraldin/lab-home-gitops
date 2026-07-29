@@ -1,16 +1,7 @@
 # Shared Postgres for Keycloak + SonarQube (CNPG).
 # Secrets postgres-superuser / role passwords are created by
 # lab-home-k8s/scripts/apply-bootstrap-secrets.sh (never commit passwords).
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: database
-  labels:
-    app.kubernetes.io/part-of: lab-home
-    lab.nasraldin.com/role: database
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
+# Namespace `database` is owned by platform/namespaces.
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
