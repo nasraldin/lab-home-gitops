@@ -17,7 +17,7 @@ LiteLLM is the only service that calls Ollama on `llm-01`.
 | App       | URL / LB                         | Notes                         |
 | --------- | -------------------------------- | ----------------------------- |
 | LiteLLM   | http://litellm.lab (.108:4000)   | Gateway                       |
-| LibreChat | http://chat.lab                  | Model dropdown                |
+| LibreChat | http://chat.lab                  | Admin seeded; registration off |
 | OpenClaw  | http://openclaw.lab (.113:18789) | Agent gateway (`ai-tools`); NPM auto `#token=` bootstrap — see `docs/operations/openclaw.md` |
 | n8n       | http://n8n.lab                   | Workflows                     |
 
