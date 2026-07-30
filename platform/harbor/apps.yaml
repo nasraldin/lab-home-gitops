@@ -26,6 +26,9 @@ spec:
           persistentVolumeClaim:
             registry:
               storageClass: longhorn
+        # Longhorn RWO: RollingUpdate leaves jobservice/registry stuck multi-attach.
+        updateStrategy:
+          type: Recreate
         trivy:
           enabled: true
           ignoreUnfixed: true
