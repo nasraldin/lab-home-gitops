@@ -21,11 +21,12 @@ spec:
         image:
           repository: ghcr.io/berriai/litellm-database
           pullPolicy: IfNotPresent
-        # Master key from Infisical → Secret litellm-secrets (PROXY_MASTER_KEY).
-        # Chart reads PROXY_MASTER_KEY / masterkey via env; do not commit the value.
+        # Master key: chart-managed Secret litellm-masterkey (key masterkey → PROXY_MASTER_KEY).
+        # Do NOT put litellm-secrets in environmentSecrets — that secret also holds
+        # POSTGRES_* keys for the Bitnami subchart; envFrom pollution breaks Prisma auth.
+        # Postgres passwords stay in litellm-secrets via postgresql.auth.existingSecret.
         masterkey: ""
-        environmentSecrets:
-          - litellm-secrets
+        environmentSecrets: []
         service:
           type: LoadBalancer
           port: 4000
