@@ -111,15 +111,16 @@ done
 
 ## Cutover status (2026-07-30)
 
-Live cluster cutover completed against local GitOps tree (API was up; GitLab
-remote still at pre-remap commit until this worktree is committed + pushed).
+Purpose namespaces are **live** and hold the workloads (LB Services in
+`ai-tools`, `artifacts`, `observability`, `storage`, `apps`, `argocd`, …).
 
 | Item | Status |
 | ---- | ------ |
 | Canonical NS present | `ai-tools`, `observability`, `database`, `artifacts`, `storage`, `security`, `gitops`, `apps`, `argocd` |
-| Old NS deleted | All listed in the loop above (none remaining) |
-| PVC/data | Lab recreate: Harbor / LibreChat Mongo / litellm PG / CNPG / Sonar volumes re-provisioned in new NS |
-| Cross-NS DNS | `litellm.ai-tools`, `postgres-rw.database`, `longhorn-backend.storage` resolve |
-| Durable GitOps | **Blocked on commit/push** — until then Argo path apps may show OutOfSync vs GitLab HEAD; do not re-enable root/path `selfHeal` until remote matches |
+| Empty legacy NS | Safe to delete when empty: `harbor`, `keycloak`, `sonarqube`, `gitlab-runner`, `cert-manager`, `kyverno`, `external-secrets`, `infisical-operator-system`, `keda`, `data-system`, … |
+| Operator leftovers | `longhorn-system` / `cnpg-system` may still exist from charts — confirm empty or migrated before prune |
+| PVC/data | Lab recreate for most apps on NS move |
+| Cross-NS DNS | `litellm.ai-tools`, `postgres-rw.database`, Infisical UA Secret in `security` |
+| Durable GitOps | Push `lab-home-gitops` to GitLab LAN + GitHub so Argo matches tree |
 
-Kept (not deleted): `kube-*`, `default`, `cilium-secrets`, `argocd`.
+Kept: `kube-*`, `default`, `cilium-secrets`, `argocd`.

@@ -56,6 +56,10 @@ LiteLLM in-cluster: `http://litellm.ai-tools.svc.cluster.local:4000/v1`
 Secrets: [Infisical](https://nasraldin.github.io/dev-homelab/architecture/secrets-and-infisical) —
 seed from `lab-home-k8s` ansible, sync via InfisicalSecret CRs.
 Auth Secret lives in `security` (`infisical-universal-auth`).
+Host API: `http://192.168.68.25:8090` / `http://infisical.lab`.
+
+**Image pins:** no `:latest` (Kyverno); no Renovate yet — bump tags in GitOps/Ansible manually
+(OpenClaw lab overlay `2026.7.1-2-slim` is the pattern).
 
 Supply chain: [docs](https://nasraldin.github.io/dev-homelab/architecture/supply-chain) —
 Kyverno Audit first; Cosign Enforce after CI signs Harbor images.
