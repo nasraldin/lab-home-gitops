@@ -53,7 +53,10 @@ spec:
               mountPath: /config
       containers:
         - name: gateway
-          image: ghcr.io/openclaw/openclaw:2026.7.1-slim
+          # Lab overlay: npm 2026.7.1-2 on official 2026.7.1-slim (upstream GHCR has no
+          # 2026.7.1-2 tag). Built by ansible role openclaw; imported to k8s nodes via
+          # playbooks/openclaw.yml. imagePullPolicy IfNotPresent — do not pull from GHCR.
+          image: ghcr.io/openclaw/openclaw:2026.7.1-2-slim
           imagePullPolicy: IfNotPresent
           command:
             - node
