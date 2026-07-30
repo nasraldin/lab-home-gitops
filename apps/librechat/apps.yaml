@@ -28,9 +28,10 @@ spec:
             limits:
               memory: 2Gi
           configEnv:
-            # Homelab: first visit creates the admin via Sign up (not a seeded password).
+            # Public signup off; admin is seeded by apps/librechat/seed-admin-job.yaml
+            # (npm run create-user) using LIBRECHAT_ADMIN_* from librechat-env / Infisical.
             ALLOW_EMAIL_LOGIN: "true"
-            ALLOW_REGISTRATION: "true"
+            ALLOW_REGISTRATION: "false"
             ALLOW_UNVERIFIED_EMAIL_LOGIN: "true"
             ALLOW_SOCIAL_LOGIN: "false"
             ALLOW_SOCIAL_REGISTRATION: "false"

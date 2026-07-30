@@ -1,0 +1,86 @@
+# Idempotent first-admin seed for LibreChat (official `npm run create-user`).
+# Runs as an ArgoCD Sync hook so re-sync after a Mongo wipe re-seeds safely.
+# Credentials: librechat-env ← Infisical apps/prod /librechat (LIBRECHAT_ADMIN_*).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: librechat-seed-admin
+  namespace: ai-tools
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "65"
+  labels:
+    app.kubernetes.io/name: librechat-seed-admin
+    app.kubernetes.io/part-of: librechat
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: librechat-seed-admin
+    spec:
+      restartPolicy: OnFailure
+      nodeSelector:
+        workload: apps
+      containers:
+        - name: seed
+          image: registry.librechat.ai/danny-avila/librechat:v0.8.7
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MONGO_URI
+              value: mongodb://librechat-mongodb.ai-tools.svc.cluster.local:27017/LibreChat
+            - name: LIBRECHAT_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: librechat-env
+                  key: LIBRECHAT_ADMIN_EMAIL
+            - name: LIBRECHAT_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: librechat-env
+                  key: LIBRECHAT_ADMIN_PASSWORD
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              email="${LIBRECHAT_ADMIN_EMAIL:?LIBRECHAT_ADMIN_EMAIL missing from librechat-env}"
+              pass="${LIBRECHAT_ADMIN_PASSWORD:?LIBRECHAT_ADMIN_PASSWORD missing from librechat-env}"
+              localpart="${email%%@*}"
+              name="${LIBRECHAT_ADMIN_NAME:-Admin}"
+              username="${LIBRECHAT_ADMIN_USERNAME:-$localpart}"
+              echo "Seeding LibreChat admin user: ${email} (username=${username})"
+              # Call node directly — `npm run` does not reliably forward stdin to the script.
+              set +e
+              out=$(node config/create-user.js \
+                "${email}" "${name}" "${username}" "${pass}" \
+                --email-verified=true 2>&1)
+              rc=$?
+              set -e
+              printf '%s\n' "${out}"
+              if [ "${rc}" -eq 0 ]; then
+                echo "Admin user created."
+                exit 0
+              fi
+              case "${out}" in
+                *"already exists"*)
+                  echo "Admin user already present — OK."
+                  exit 0
+                  ;;
+              esac
+              echo "create-user failed (rc=${rc})"
+              exit "${rc}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
